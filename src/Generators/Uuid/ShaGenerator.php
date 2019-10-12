@@ -21,9 +21,26 @@ use Ramsey\Uuid\Uuid;
 class ShaGenerator implements UuidGenerator
 {
     /**
+     * A custom prefix to all tenants (keep databases organized)
+     */
+    private $tenantPrefix = null;
+
+    public function __construct(){
+        $this->tenantPrefix = env('DB_TENANT_PREFIX') ? env('DB_TENANT_PREFIX') : '';
+    }
+
+    /**
      * @param Website $website
      * @return string
      */
+    public function generate(Website $website) : string
+    {
+        $rand = \Str::random(19);
+        return $this->tenantPrefix.$rand;
+    }
+
+    /*
+     * Default hyn function
     public function generate(Website $website) : string
     {
         $uuid = Uuid::uuid4()->toString();
@@ -33,5 +50,7 @@ class ShaGenerator implements UuidGenerator
         }
 
         return $uuid;
-    }
+    } 
+     */
+    
 }

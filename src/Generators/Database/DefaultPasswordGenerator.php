@@ -25,15 +25,39 @@ class DefaultPasswordGenerator implements PasswordGenerator
      */
     protected $app;
 
+    /**
+     * Keep env secret
+     */
+    private $secret = null;
+
     public function __construct(Application $app)
     {
         $this->app = $app;
+
+        /**
+         * Get env secret
+         */
+        $this->secret = env('APP_KEY');
     }
 
     /**
+     * Custom pwd generator
      * @param Website $website
      * @return string
      */
+    public function generate(Website $website) : string
+    {
+        $aux = "{$website->id}{$website->uuid}{$this->secret}";
+
+        //Start the pwd with some letter, because symbols can cause errors
+        $pwd = substr('BR'.md5($aux), 0, 12); 
+        
+        ///\Log::info("PWD generated for new tenant: $website->uuid");
+        return $pwd;
+    }
+
+    /*
+     *Default Hyn funcion to PWD
     public function generate(Website $website) : string
     {
         $key = $this->app['config']->get('tenancy.key');
@@ -55,4 +79,5 @@ class DefaultPasswordGenerator implements PasswordGenerator
             $key
         ));
     }
+    */
 }
