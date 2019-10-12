@@ -25,7 +25,7 @@ use Illuminate\Database\Connection as IlluminateConnection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-class MariaDB implements DatabaseGenerator
+class SQLServer implements DatabaseGenerator
 {
     //Lost repository that was done
     //Need to finish the implementation again
