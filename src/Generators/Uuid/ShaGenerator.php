@@ -36,6 +36,8 @@ class ShaGenerator implements UuidGenerator
     public function generate(Website $website) : string
     {
         $rand = \Str::random(19);
+
+        //return custom value
         return $this->tenantPrefix.$rand;
     }
 
