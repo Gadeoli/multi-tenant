@@ -26,7 +26,7 @@ class ShaGenerator implements UuidGenerator
     private $tenantPrefix = null;
 
     public function __construct(){
-        $this->tenantPrefix = env('DB_TENANT_PREFIX') ? env('DB_TENANT_PREFIX') : '';
+        $this->tenantPrefix = env('TENANCY_DATABASE_PREFIX') ? env('TENANCY_DATABASE_PREFIX') : '';
     }
 
     /**
