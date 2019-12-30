@@ -19,6 +19,7 @@ use Hyn\Tenancy\Generators\Webserver\Database\DatabaseDriverFactory;
 use Hyn\Tenancy\Generators\Webserver\Database\Drivers\MariaDB;
 use Hyn\Tenancy\Generators\Webserver\Database\Drivers\PostgreSQL;
 use Hyn\Tenancy\Generators\Webserver\Database\Drivers\PostgresSchema;
+use Hyn\Tenancy\Generators\Webserver\Database\Drivers\SQLServer;
 use Illuminate\Support\ServiceProvider;
 
 class DatabaseDriverProvider extends ServiceProvider
@@ -39,6 +40,7 @@ class DatabaseDriverProvider extends ServiceProvider
         return [
             'pgsql' => $isPgsqlSchema ? PostgresSchema::class : PostgreSQL::class,
             'mysql' => MariaDB::class,
+            'sqlsrv'=> SQLServer::class,
         ];
     }
 }

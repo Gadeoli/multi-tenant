@@ -40,28 +40,77 @@ class SQLServer implements DatabaseGenerator
 
         if ($createUser) {
             return
-                $this->createUser($connection, $config) &&
                 $this->createDatabase($connection, $config) &&
+                $this->createUser($connection, $config) &&
                 $this->grantPrivileges($connection, $config);
         } else {
             return $this->createDatabase($connection, $config);
         }
     }
 
-    protected function createUser(IlluminateConnection $connection, array $config)
-    {
-        return $connection->statement("IF NOT EXISTS(SELECT principal_id FROM sys.server_principals WHERE name = '{$config['username']}') BEGIN CREATE LOGIN {$config['username']} WITH PASSWORD = '{$config['password']}' END 
-        IF NOT EXISTS (SELECT principal_id FROM sys.database_principals WHERE name = '{$config['username']}') BEGIN CREATE USER {$config['username']} FOR LOGIN {$config['username']} END");
-    }
-
     protected function createDatabase(IlluminateConnection $connection, array $config)
     {
-        return $connection->statement("IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{$config['database']}') CREATE DATABASE {$config['database']};");
+        $usernameGlobal = env('TENANCY_USERNAME', null);
+        
+        return $connection->statement("
+            IF NOT EXISTS (
+                SELECT * FROM sys.databases WHERE 
+                name = '{$config['database']}'
+            ) BEGIN
+                CREATE DATABASE {$config['database']};
+            END");
+    }
+
+    protected function createUser(IlluminateConnection $connection, array $config)
+    {
+        $username = $config['username'];
+         $database = $config['database'];
+
+        return $connection->statement("
+        IF NOT EXISTS(
+            SELECT principal_id FROM sys.server_principals 
+            WHERE name = '{$username}'
+            ) BEGIN 
+                USE {$database};
+                CREATE LOGIN {$username} 
+                WITH PASSWORD = '{$config['password']}', 
+                DEFAULT_DATABASE = {$database},
+                DEFAULT_LANGUAGE = English;
+                CREATE USER {$username} 
+                FOR LOGIN {$username}; 
+            END");
     }
 
     protected function grantPrivileges(IlluminateConnection $connection, array $config)
     {
-        $privileges = config('tenancy.db.tenant-database-user-privileges', null) ?? 'ALL';
-            return $connection->statement("USE {$config['database']} GRANT $privileges TO {$config['username']}");
+        $usernameGlobal = env('TENANCY_USERNAME', null);
+        $databaseGlobal = env('TENANCY_DATABASE', null);
+
+        return $connection->statement("
+            USE {$config['database']}; 
+            GRANT ALL TO {$usernameGlobal};
+            GRANT ALL TO {$config['username']};
+            GRANT ALTER, CONTROL ON SCHEMA::dbo TO {$usernameGlobal}; 
+            GRANT ALTER, CONTROL ON SCHEMA::dbo TO {$config['username']}; 
+            USE {$databaseGlobal};
+        ");
+    }
+
+    //not implemented
+    public function updated(Updated $event, array $config, Connection $connection): bool
+    {
+        return false;
+    }
+
+    //not implemented
+    public function deleted(Deleted $event, array $config, Connection $connection): bool
+    {
+        return false;
+    }
+
+    //not implemented
+    public function updatePassword(Website $website, array $config, Connection $connection): bool
+    {
+        return false;
     }
 }
