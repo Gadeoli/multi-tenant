@@ -1,5 +1,9 @@
 ## Fork to sqlserver connection with hyn-tenant package
 
+- Used custom generators and configured new sqlsrv driver on:
+src/providers/tenants/databasedriverprovider &&
+src/generators/webserver/database/drivers/SQLServer
+
 ## Tested with enviroment:
 
 - Win10
@@ -18,7 +22,7 @@ Add the new extension (pdo_sqlsrv and sqlsrv) to your php.ini file
 extension=pdo_sqlsrv (...)
 extension=sqlsrv (...)
 
-## Create a new user and set him permissions (i don't like to use user sa / just set sysadmin)
+## Create a new user and set him permissions (i don't like to use user sa / set sysadmin on newuser)
 
 Set user language if necessary:
 ```
@@ -42,7 +46,7 @@ Reconfigure
 }
 ```
 
-## Configure your env vars:
+## Configure env vars:
 .env
 ```
 #Tenancy configs
